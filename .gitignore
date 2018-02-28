@@ -1,3 +1,6 @@
+# Keep lib folder
+!/lib/*
+
 # Compiled class file
 *.class
 
