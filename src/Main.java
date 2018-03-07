@@ -17,7 +17,7 @@ public class Main {
 
     /**
      * For lib usage: https://code.google.com/archive/p/cliche/wikis/Manual.wiki
-     *
+     * UTF-8 table for testing: http://www.utf8-chartable.de/unicode-utf8-table.pl
      */
     public static void main(String[] args) throws IOException {
         ShellFactory.createConsoleShell("Shell@Hackerboyy", "", new Main())
@@ -56,6 +56,36 @@ public class Main {
             System.out.println(Huffman.decode(hits, encoded));
         } else {
             System.out.println("Oops! Missing arguments!");
+        }
+    }
+
+    @Command
+    public void testWriteToFile() {
+        if (hits != null && encoded != null) {
+            try {
+                Huffman.writeToFile(hits, encoded);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Oops! Missing arguments!");
+        }
+    }
+
+    @Command
+    public void testReadFromFile() {
+        try {
+            HashMap<Character, String> keys = Huffman.readFromFile();
+            if (keys == null) {
+                throw new NullPointerException();
+            }
+
+            encoded = keys.get('\uE088'); //http://www.utf8-chartable.de/unicode-utf8-table.pl | U+E000 ... U+F8FF: Private Use Area
+            keys.remove('\uE088');
+
+            hits = keys;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

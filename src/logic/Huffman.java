@@ -1,10 +1,12 @@
 package logic;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Huffman {
+    private static final String PATH = "output/";
 
     private Huffman() {
         throw new IllegalStateException("Utility class");
@@ -204,5 +206,41 @@ public class Huffman {
         }
 
         return root;
+    }
+
+    /**
+     * Writes the given keys and encoded string to a bin file.
+     *
+     * @param keys    The keys that should be saved.
+     * @param encoded The corresponding string that should be saved.
+     * @throws IOException
+     */
+    public static void writeToFile(HashMap<Character, String> keys, String encoded) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + "encoded.bin"))) {
+            oos.writeObject(keys);
+            oos.writeObject(encoded);
+        }
+    }
+
+    /**
+     * Reads the given bin file.
+     *
+     * @return HashMap with the characters and their codes. Also includes a character ('\uE088') rom the Private Use Area as defined by the Unicode standard (http://www.unicode.org/faq/private_use.html)
+     * This character is used to transport the encoded string down to the caller. The caller should take the pair from the HashMap and remove it before continuing working with it.
+     * Technically there should be no issue, as long as the text doesn't contain that exact character (which is an exception in itself), but to prevent any unforeseen issues it is advisable to do.
+     * The character doesn't seem to be used publicly anywhere now: http://www.alanwood.net/unicode/private_use_area.html
+     * @throws IOException
+     */
+    public static HashMap<Character, String> readFromFile() throws IOException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + "encoded.bin"))) {
+            HashMap<Character, String> keys = (HashMap<Character, String>) ois.readObject();
+            String encoded = (String) ois.readObject();
+            System.out.println("Encoded: " + encoded);
+            keys.put('\uE088', encoded); //http://www.utf8-chartable.de/unicode-utf8-table.pl | U+E000 ... U+F8FF: Private Use Area
+            return keys;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
