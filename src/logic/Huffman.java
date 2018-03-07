@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Huffman {
@@ -36,6 +37,7 @@ public class Huffman {
      */
     public static HashMap<Character, Long> determineWeight(String string) {
         HashMap<Character, Long> characters = new HashMap<>();
+        //Mergemap lambda?
 
         for (int i = 0; i < string.length(); i++) {
             if (characters.containsKey(string.charAt(i))) {
@@ -96,7 +98,7 @@ public class Huffman {
     /**
      * Internal recursion function to allow for pushing back to a hashMap
      *
-     * @param node The root Node object which will contain the entire tree.
+     * @param node   The root Node object which will contain the entire tree.
      * @param string The code that is generated.
      */
     private static void checkNodes(Node node, String string) {
@@ -125,11 +127,82 @@ public class Huffman {
     /**
      * Encodes the given string with the keys.
      *
-     * @param keys The keys which which the string should be encoded.
+     * @param keys   The keys which which the string should be encoded.
      * @param string The string that should be encoded.
      * @return The encoded string.
      */
     public static String encode(HashMap<Character, String> keys, String string) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            sb.append(keys.get(string.charAt(i)));
+        }
+        System.out.println("Code: " + sb.toString());
+        return sb.toString();
+    }
 
+    /**
+     * Decodes the given string with the keys.
+     *
+     * @param keys          The keys with which the string can be decoded.
+     * @param encodedString The encoded string that should be decoded.
+     * @return The decoded string.
+     */
+    public static String decode(HashMap<Character, String> keys, String encodedString) {
+        StringBuilder sb = new StringBuilder();
+        Node root = rebuildTree(keys);
+        Node currNode = root;
+
+        for (int i = 0; i < encodedString.length(); i++) {
+            Character currChar = encodedString.charAt(i);
+            if (currChar == '1') {
+                currNode = currNode.getRight();
+            } else if (currChar == '0') {
+                currNode = currNode.getLeft();
+            }
+
+            if (currNode.chararacter != null) {
+                sb.append(currNode.chararacter);
+                currNode = root;
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Steps through the given HashMap to rebuild the tree.
+     *
+     * @param keys The keys with which the tree can be rebuilt.
+     * @return The rebuilt node tree.
+     */
+    private static Node rebuildTree(HashMap<Character, String> keys) {
+        Node root = new Node();
+        Node currNode;
+
+        for (Map.Entry<Character, String> entry : keys.entrySet()) {
+            currNode = root;
+            for (int i = 0; i <= entry.getValue().length(); i++) {
+                if (i == entry.getValue().length()) {
+                    //At the end of the code; the character should be inserted here
+                    currNode.chararacter = entry.getKey().toString();
+                } else {
+                    if (entry.getValue().charAt(i) == '1') {
+                        //Should step right
+                        if (currNode.right == null) {
+                            currNode.right = new Node();
+                        }
+                        currNode = currNode.getRight();
+
+                    } else if (entry.getValue().charAt(i) == '0') {
+                        //Should step left
+                        if (currNode.left == null) {
+                            currNode.left = new Node();
+                        }
+                        currNode = currNode.getLeft();
+                    }
+                }
+            }
+        }
+
+        return root;
     }
 }

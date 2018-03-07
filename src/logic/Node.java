@@ -2,9 +2,9 @@ package logic;
 
 public class Node {
     Node left, right;
+
     double weight;
     String chararacter;
-
     /**
      * Initial constructor to create the bottom nodes (with characters).
      *
@@ -35,5 +35,28 @@ public class Node {
             this.left = right;
             this.right = left;
         }
+    }
+
+    /**
+     * Empty constructor for rebuilding the tree structure.
+     */
+    public Node() {
+
+    }
+
+    public Node getLeft() {
+        return left;
+    }
+
+    public void setLeft(Node left) {
+        this.left = left;
+    }
+
+    public Node getRight() {
+        return right;
+    }
+
+    public void setRight(Node right) {
+        this.right = right;
     }
 }

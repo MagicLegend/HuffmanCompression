@@ -13,6 +13,7 @@ public class Main {
     static PriorityQueue<Node> leaves;
     static Node root;
     static HashMap<Character, String> hits;
+    static String encoded;
 
     /**
      * For lib usage: https://code.google.com/archive/p/cliche/wikis/Manual.wiki
@@ -45,6 +46,16 @@ public class Main {
         System.out.println("Done building tree...");
         hits = Huffman.generateCode(root);
         System.out.println("Done generating codes...");
+        encoded = Huffman.encode(hits, s);
+        System.out.println("Done encoding...");
+    }
 
+    @Command
+    public void testDecode() {
+        if (hits != null && encoded != null) {
+            System.out.println(Huffman.decode(hits, encoded));
+        } else {
+            System.out.println("Oops! Missing arguments!");
+        }
     }
 }
