@@ -1,6 +1,7 @@
 import asg.cliche.Command;
 import asg.cliche.ShellFactory;
 import logic.Huffman;
+import logic.IO;
 import logic.Node;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class Main {
+    static String IPSUM = IO.readLorem10k();
     static String string;
     static HashMap<Character, Long> characters;
     static PriorityQueue<Node> leaves;
@@ -37,8 +39,9 @@ public class Main {
 
     @Command
     public void testBuildTree(String s) {
-        System.out.println("Using String " + s);
-        characters = Huffman.determineWeight(s);
+        string = IPSUM;
+        System.out.println("Using String " + string);
+        characters = Huffman.determineWeight(string);
         System.out.println("Done calculating weights...");
         leaves = Huffman.generateLeaves(characters);
         System.out.println("Done building leaves...");
@@ -46,7 +49,7 @@ public class Main {
         System.out.println("Done building tree...");
         hits = Huffman.generateCode(root);
         System.out.println("Done generating codes...");
-        encoded = Huffman.encode(hits, s);
+        encoded = Huffman.encode(hits, string);
         System.out.println("Done encoding...");
     }
 
@@ -63,7 +66,7 @@ public class Main {
     public void testWriteToFile() {
         if (hits != null && encoded != null) {
             try {
-                Huffman.writeToFile(hits, encoded);
+                IO.writeHuffmanToFile(hits, encoded);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,9 +76,16 @@ public class Main {
     }
 
     @Command
+    public void testBitsWriteToFile() {
+        if (hits != null && encoded != null) {
+            IO.writeHuffmanAsBitsToFile(hits, encoded);
+        }
+    }
+
+    @Command
     public void testReadFromFile() {
         try {
-            HashMap<Character, String> keys = Huffman.readFromFile();
+            HashMap<Character, String> keys = IO.readHuffmanFromFile();
             if (keys == null) {
                 throw new NullPointerException();
             }
@@ -87,5 +97,18 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Command
+    public void testBitsReadFromFile() {
+        HashMap<Character, String> keys = IO.readHuffmanAsBitsFromFile();
+        if (keys == null) {
+            throw new NullPointerException();
+        }
+
+        encoded = keys.get('\uE088'); //http://www.utf8-chartable.de/unicode-utf8-table.pl | U+E000 ... U+F8FF: Private Use Area
+        keys.remove('\uE088');
+
+        hits = keys;
     }
 }
