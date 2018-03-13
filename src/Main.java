@@ -6,10 +6,10 @@ import logic.Node;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Main {
-    static String IPSUM = IO.readLorem10k();
     static String string;
     static HashMap<Character, Long> characters;
     static PriorityQueue<Node> leaves;
@@ -33,13 +33,7 @@ public class Main {
     }
 
     @Command
-    public void testDetermineCharacters(String s) {
-        characters = Huffman.determineWeight(s);
-    }
-
-    @Command
-    public void testBuildTree(String s) {
-        string = IPSUM;
+    public void testBuildTree() {
         System.out.println("Using String " + string);
         characters = Huffman.determineWeight(string);
         System.out.println("Done calculating weights...");
@@ -54,6 +48,11 @@ public class Main {
     }
 
     @Command
+    public void readLoremFromFile(String s) {
+        string = IO.readLoremFromFile(s);
+    }
+
+    @Command
     public void testDecode() {
         if (hits != null && encoded != null) {
             System.out.println(Huffman.decode(hits, encoded));
@@ -63,10 +62,10 @@ public class Main {
     }
 
     @Command
-    public void testWriteToFile() {
+    public void testWriteToFile(String file) {
         if (hits != null && encoded != null) {
             try {
-                IO.writeHuffmanToFile(hits, encoded);
+                IO.writeHuffmanToFile(file, hits, encoded);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -76,16 +75,16 @@ public class Main {
     }
 
     @Command
-    public void testBitsWriteToFile() {
+    public void testBitsWriteToFile(String file) {
         if (hits != null && encoded != null) {
-            IO.writeHuffmanAsBitsToFile(hits, encoded);
+            IO.writeHuffmanAsBitsToFile(file, hits, encoded);
         }
     }
 
     @Command
-    public void testReadFromFile() {
+    public void testReadFromFile(String file) {
         try {
-            HashMap<Character, String> keys = IO.readHuffmanFromFile();
+            HashMap<Character, String> keys = IO.readHuffmanFromFile(file);
             if (keys == null) {
                 throw new NullPointerException();
             }
@@ -100,8 +99,8 @@ public class Main {
     }
 
     @Command
-    public void testBitsReadFromFile() {
-        HashMap<Character, String> keys = IO.readHuffmanAsBitsFromFile();
+    public void testBitsReadFromFile(String file) {
+        HashMap<Character, String> keys = IO.readHuffmanAsBitsFromFile(file);
         if (keys == null) {
             throw new NullPointerException();
         }

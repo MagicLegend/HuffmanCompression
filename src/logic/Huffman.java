@@ -1,6 +1,5 @@
 package logic;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -9,26 +8,6 @@ public class Huffman {
 
     private Huffman() {
         throw new IllegalStateException("Utility class");
-    }
-
-    /**
-     * Checks if the string is in the ASCII table.
-     *
-     * @param string The string to be checked.
-     * @return If all the characters in the string are in the ASCII table.
-     */
-    public static Boolean isASCII(String string) {
-        //Highest possible UTF-8 character: 洖 | 55422 //http://www.utf8-chartable.de/unicode-utf8-table.pl
-        //1048831
-//        for (int i = 0; i < string.length(); i++) {
-//            if (string.charAt(i) > 1048830) {
-//                return false;
-//            }
-//        }
-
-        //<charAt(), count>
-
-        return true;
     }
 
     /**
@@ -54,13 +33,13 @@ public class Huffman {
     }
 
     /**
-     * Takes the hashmap with <K,V> structure <Character, Count> and iterates over it. For each iteration a new Node is added to the queue.
+     * Takes the HashMap with <K,V> structure <Character, Count> and iterates over it. For each iteration a new Node is added to the queue.
      * The queue has a custom comparator, which will check if the weight of the nodes are above or below each other.
      * TODO: Check if a case for equal nodes is needed.
      *
      * @param characters The characters with their counts that should be interpreted.
      */
-    public static PriorityQueue<Node> generateLeaves(HashMap<Character, Long> characters) {
+    public static PriorityQueue<Node> generateLeaves(Map<Character, Long> characters) {
         //Comparison from: https://gist.github.com/ahmedengu/aa8d85b12fccf0d08e895807edee7603
         PriorityQueue<Node> leaves = new PriorityQueue<>((o1, o2) -> (o1.weight < o2.weight) ? -1 : 1);
 
@@ -132,7 +111,7 @@ public class Huffman {
      * @param string The string that should be encoded.
      * @return The encoded string.
      */
-    public static String encode(HashMap<Character, String> keys, String string) {
+    public static String encode(Map<Character, String> keys, String string) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             sb.append(keys.get(string.charAt(i)));
@@ -148,7 +127,7 @@ public class Huffman {
      * @param encodedString The encoded string that should be decoded.
      * @return The decoded string.
      */
-    public static String decode(HashMap<Character, String> keys, String encodedString) {
+    public static String decode(Map<Character, String> keys, String encodedString) {
         StringBuilder sb = new StringBuilder();
         Node root = rebuildTree(keys);
         Node currNode = root;
@@ -175,13 +154,17 @@ public class Huffman {
      * @param keys The keys with which the tree can be rebuilt.
      * @return The rebuilt node tree.
      */
-    private static Node rebuildTree(HashMap<Character, String> keys) {
+    private static Node rebuildTree(Map<Character, String> keys) {
         Node root = new Node();
         Node currNode;
 
         for (Map.Entry<Character, String> entry : keys.entrySet()) {
+            //Reset the current node to the root to start fresh again
             currNode = root;
+
+            //For each bit in the entry
             for (int i = 0; i <= entry.getValue().length(); i++) {
+                //If they are equal, all the bits have been processed to nodes, and the final leaf should get the character
                 if (i == entry.getValue().length()) {
                     //At the end of the code; the character should be inserted here
                     currNode.chararacter = entry.getKey().toString();

@@ -20,8 +20,8 @@ public class IO {
      * @param encoded The corresponding string that should be saved.
      * @throws IOException
      */
-    public static void writeHuffmanToFile(HashMap<Character, String> keys, String encoded) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + "encoded.bin"))) {
+    public static void writeHuffmanToFile(String file, HashMap<Character, String> keys, String encoded) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + file))) {
             oos.writeObject(keys);
             oos.writeObject(encoded);
         }
@@ -33,7 +33,7 @@ public class IO {
      * @param keys    The keys that should be saved.
      * @param encoded The corresponding string that should be saved.
      */
-    public static void writeHuffmanAsBitsToFile(HashMap<Character, String> keys, String encoded) {
+    public static void writeHuffmanAsBitsToFile(String file, HashMap<Character, String> keys, String encoded) {
         BitSet bitSet = new BitSet(encoded.length());
 
         int bitCounter = 0;
@@ -45,7 +45,7 @@ public class IO {
             bitCounter++;
         }
 
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + "encoded.bin"))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + file))) {
             oos.writeObject(keys);
             oos.writeObject(bitSet);
         } catch (IOException e) {
@@ -53,13 +53,13 @@ public class IO {
         }
     }
 
-    public static HashMap<Character, String> readHuffmanAsBitsFromFile() {
+    public static HashMap<Character, String> readHuffmanAsBitsFromFile(String file) {
         String encoded = "";
         BitSet bitSet = null;
         HashMap<Character, String> keys = null;
         StringBuilder sb = new StringBuilder();
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + "encoded.bin"))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + file))) {
             keys = (HashMap<Character, String>) ois.readObject();
             bitSet = (BitSet) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
@@ -95,8 +95,8 @@ public class IO {
      * The character doesn't seem to be used publicly anywhere now: http://www.alanwood.net/unicode/private_use_area.html
      * @throws IOException
      */
-    public static HashMap<Character, String> readHuffmanFromFile() throws IOException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + "encoded.bin"))) {
+    public static HashMap<Character, String> readHuffmanFromFile(String file) throws IOException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + file))) {
             HashMap<Character, String> keys = (HashMap<Character, String>) ois.readObject();
             String encoded = (String) ois.readObject();
             System.out.println("Encoded: " + encoded);
@@ -113,10 +113,10 @@ public class IO {
      *
      * @return A load of lorem ipsum.
      */
-    public static String readLorem10k() {
+    public static String readLoremFromFile(String file) {
         String content = "";
         try {
-            content = new String(Files.readAllBytes(Paths.get("output/10kLorem.txt")));
+            content = new String(Files.readAllBytes(Paths.get(PATH + file)));
         } catch (IOException e) {
             e.printStackTrace();
         }
