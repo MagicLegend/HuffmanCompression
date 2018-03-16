@@ -7,7 +7,9 @@ import main.com.magiclegend.huffman.logic.IO;
 import main.com.magiclegend.huffman.logic.Node;
 
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class Main {
@@ -16,6 +18,7 @@ public class Main {
     private static PriorityQueue<Node> leaves;
     private static Node root;
     private static HashMap<Character, String> hits;
+    private static HashMap<Character, BitSet> hitSet;
     private static String encoded;
 
     /**
@@ -46,6 +49,23 @@ public class Main {
         System.out.println("Done generating codes...");
         encoded = Huffman.encode(hits, string);
         System.out.println("Done encoding...");
+    }
+
+    @Command
+    public void testBuildTreev2() {
+        if (!Objects.equals(string, "")) {
+            System.out.println("Using String " + string);
+            characters = Huffman.determineWeight(string);
+            System.out.println("Done calculating weights...");
+            leaves = Huffman.generateLeaves(characters);
+            System.out.println("Done building leaves...");
+            root = Huffman.buildTree(leaves);
+            System.out.println("Done building tree...");
+            hitSet = Huffman.checkNodesv2(root, new HashMap<>(), new BitSet(), new Integer(0));
+            System.out.println("Done generating codes...");
+//            encoded = Huffman.encode(hits, string);
+//            System.out.println("Done encoding...");
+        }
     }
 
     @Command
