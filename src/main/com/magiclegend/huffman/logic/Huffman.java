@@ -1,5 +1,6 @@
 package main.com.magiclegend.huffman.logic;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -104,6 +105,52 @@ public class Huffman {
                 }
             }
         }
+    }
+
+    public static void generateCodeV2(Node node) {
+        //0100 0000 0000 0011 1111 1011 //max value (4195323)
+        //https://math.stackexchange.com/a/664856 (amount of nodes = 4n - 1; where n = amount of leaves)
+        //This means that the first three bytes of the bitSet should be reserved for counting. This would mean that it would support a tree with 16.777.215 nodes, but that is the point that with the current Unicode will cannot be reached. There are not enough characters (only 1.048.831)
+    }
+
+    /**
+     * Updated version to integrate the variables. Checks if a node is a tree node, and recursivly runs the function again on that node.
+     * Will add the code of the character to the bitSet until the leaf node is found. Then it will add it to the hashmap that is passed along.
+     * It will return the HashMap back to the upper levels, and it will go down the tree again.
+     *
+     * @param node The root node on the initial call, after that it's the tree node until the leaf is reached.
+     * @param hits The HashMap with the Character and it's corresponding code in a BitSet.
+     * @param bitSet The code of the current character that's being built. Cleared when a leaf has been reached.
+     * @param counter The counter to keep track of what location the bit should be flipped. Reset to 0 when a leaf has been reached.
+     * @return
+     */
+    public static HashMap<Character, BitSet> checkNodesv2(Node node, HashMap<Character, BitSet> hits, BitSet bitSet, Integer counter) {
+        if (node != null) {
+            if (node.right != null) {
+                bitSet.set(counter);
+                counter++;
+                checkNodesv2(node.right, hits, bitSet, counter);
+            }
+
+            if (node.left != null) {
+                counter++;
+                checkNodesv2(node.left, hits, bitSet, counter);
+            }
+
+            if (node.right == null && node.left == null) {
+                if (node.chararacter.length() == 1) {
+                    System.out.println("Char: " + node.chararacter + " | Code: " + bitSet.toString());
+                    hits.put(node.chararacter.charAt(0), bitSet);
+                    bitSet.clear();
+                    counter = 0;
+                    return hits;
+                } else {
+                    System.out.println("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
+                    throw new IllegalArgumentException("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
+                }
+            }
+        }
+        return hits;
     }
 
     /**
