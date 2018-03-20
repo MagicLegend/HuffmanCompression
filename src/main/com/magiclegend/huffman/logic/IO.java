@@ -44,6 +44,7 @@ public class IO {
 
             bitCounter++;
         }
+        bitSet.set(bitCounter); //Set the latest bit to true to prevent data loss in case the last bits were false.
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + file))) {
             oos.writeObject(keys);
@@ -69,7 +70,7 @@ public class IO {
         if (bitSet != null) {
             System.out.println("Size: " + bitSet.size());
             System.out.println("Length: " + bitSet.length());
-            for(int i = 0; i <= bitSet.length(); i++) {
+            for(int i = 0; i < bitSet.length() - 1; i++) { //Because the length() returns the length + 1; and the final bit needs to be ignored a -1 in combination with the < (instead of <=) is needed.
                 if(bitSet.get(i)) {
                     sb.append("1");
                 } else {

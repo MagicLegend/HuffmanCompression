@@ -55,7 +55,7 @@ class HuffmanTest extends GroovyTestCase {
         return characters
     }
 
-    static private PriorityQueue<Node> getQueue() {
+    private static PriorityQueue<Node> getQueue() {
         PriorityQueue<Node> queue = new PriorityQueue<>()
 
         HashMap<Character, Long> characters = getCharacters()
