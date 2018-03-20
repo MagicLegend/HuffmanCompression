@@ -11,8 +11,10 @@ class HuffmanTest extends GroovyTestCase {
     }
 
     void testGenerateLeaves() {
-        assertEquals(getQueue().poll().getChararacter(), Huffman.generateLeaves(getCharacters()).poll().getChararacter())
-        assertEquals(getQueue().poll().getChararacter(), Huffman.generateLeaves(getCharacters()).poll().getChararacter())
+        PriorityQueue<Node> leaves = Huffman.generateLeaves(getCharacters())
+        PriorityQueue<Node> expected = getQueue()
+        assertEquals(expected.poll().getChararacter(), leaves.poll().getChararacter())
+        assertEquals(expected.poll().getChararacter(), leaves.poll().getChararacter())
     }
 
     void testBuildTree() {
@@ -23,7 +25,7 @@ class HuffmanTest extends GroovyTestCase {
     }
 
     void testGenerateCode() {
-        HashMap<Character, String> test = Huffman.generateCode(getRoot())
+        HashMap<Character, String> test = Huffman.generateCode(getRoot(), false)
         assertEquals(true, test.containsKey('e' as Character))
         assertEquals("000", test.get('e' as Character))
         assertEquals("0110", test.get('r' as Character))

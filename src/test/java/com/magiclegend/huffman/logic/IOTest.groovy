@@ -26,7 +26,7 @@ class IOTest extends GroovyTestCase {
         File file = new File("output/unitTestBits.bin")
         if (file.exists() && !file.isDirectory()) {
             HashCode hc = Files.asByteSource(file).hash(Hashing.sha256())
-            assertEquals("1989e09c076508ee0e5a2e46a7de9bd29a23cf7d87e122b06160c6c3ad1527de", hc.toString())
+            assertEquals("47e53309357339d0a87ea5eca17f060e45daa1e99bb7406d0a63376217bb497a", hc.toString())
             assertEquals(true, file.exists())
         } else {
             fail("File was not found or was a directory!")

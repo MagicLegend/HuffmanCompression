@@ -20,13 +20,13 @@ public class Huffman {
         HashMap<Character, Long> characters = new HashMap<>();
         //Mergemap lambda?
 
-        for (int i = 0; i < string.length(); i++) {
-            if (characters.containsKey(string.charAt(i))) {
-                Long l = characters.get(string.charAt(i));
+        for (int i = 0; i < string.length(); i++) {             //O(n)
+            if (characters.containsKey(string.charAt(i))) {     //O(1)
+                Long l = characters.get(string.charAt(i));      //O(n)
                 l++;
-                characters.put(string.charAt(i), l);
+                characters.put(string.charAt(i), l);            //O(n)
             } else {
-                characters.put(string.charAt(i), 1L);
+                characters.put(string.charAt(i), 1L);           //O(n)
             }
         }
 
@@ -44,6 +44,7 @@ public class Huffman {
         //Comparison from: https://gist.github.com/ahmedengu/aa8d85b12fccf0d08e895807edee7603
         PriorityQueue<Node> leaves = new PriorityQueue<>((o1, o2) -> (o1.weight < o2.weight) ? -1 : 1);
 
+        //          O(n)                         O(n)
         characters.forEach((key, value) -> leaves.add(new Node(key, value)));
 
         return leaves;
@@ -55,8 +56,8 @@ public class Huffman {
      * @param tree The bottom leaves with their weight.
      */
     public static Node buildTree(PriorityQueue<Node> tree) {
-        while (tree.size() > 1) {
-            tree.add(new Node(tree.poll(), tree.poll()));
+        while (tree.size() > 1) {                               //O(n) ????
+            tree.add(new Node(tree.poll(), tree.poll()));       //O(n)
         }
 
         return tree.peek();
@@ -72,9 +73,9 @@ public class Huffman {
      * @param node The root Node object which will contain the entire tree.
      * @return HashMap with the character and the corresponding code.
      */
-    public static HashMap<Character, String> generateCode(Node node) {
+    public static HashMap<Character, String> generateCode(Node node, boolean log) {
         hits = new HashMap<>();
-        checkNodes(node, "");
+        checkNodes(node, "", log);
         return hits;
     }
 
@@ -84,20 +85,22 @@ public class Huffman {
      * @param node   The root Node object which will contain the entire tree.
      * @param string The code that is generated.
      */
-    private static void checkNodes(Node node, String string) {
+    private static void checkNodes(Node node, String string, boolean log) {
         if (node != null) {
             if (node.right != null) {
-                checkNodes(node.right, string + "1");
+                checkNodes(node.right, string + "1", log);
             }
 
             if (node.left != null) {
-                checkNodes(node.left, string + "0");
+                checkNodes(node.left, string + "0", log);
             }
 
             if (node.right == null && node.left == null) {
                 //Done generating code
                 if (node.chararacter.length() == 1) {
-                    System.out.println("Char: " + node.chararacter + " | Code: " + string);
+                    if (log) {
+                        System.out.println("Char: " + node.chararacter + " | Code: " + string);
+                    }
                     hits.put(node.chararacter.charAt(0), string);
                 } else {
                     System.out.println("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
@@ -124,12 +127,14 @@ public class Huffman {
      * @param counter The counter to keep track of what location the bit should be flipped. Reset to 0 when a leaf has been reached.
      * @return
      */
-    public static HashMap<Character, BitSet> checkNodesv2(Node node, HashMap<Character, BitSet> hits, BitSet bitSet, Integer counter) {
+    public static HashMap<Character, BitSet> checkNodesv2(Node node, HashMap<Character, BitSet> hits, BitSet bitSet, int counter) {
         if (node != null) {
             if (node.right != null) {
                 bitSet.set(counter);
                 counter++;
+                int temp = counter;
                 checkNodesv2(node.right, hits, bitSet, counter);
+                counter = temp;
             }
 
             if (node.left != null) {
@@ -162,10 +167,10 @@ public class Huffman {
      */
     public static String encode(Map<Character, String> keys, String string) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < string.length(); i++) {
-            sb.append(keys.get(string.charAt(i)));
+        for (int i = 0; i < string.length(); i++) {     //O(n)
+            sb.append(keys.get(string.charAt(i)));      //O(n)
         }
-        System.out.println("Code: " + sb.toString());
+        //System.out.println("Code: " + sb.toString());
         return sb.toString();
     }
 
@@ -207,25 +212,25 @@ public class Huffman {
         Node root = new Node();
         Node currNode;
 
-        for (Map.Entry<Character, String> entry : keys.entrySet()) {
+        for (Map.Entry<Character, String> entry : keys.entrySet()) {        //O(n)
             //Reset the current node to the root to start fresh again
             currNode = root;
 
             //For each bit in the entry
-            for (int i = 0; i <= entry.getValue().length(); i++) {
+            for (int i = 0; i <= entry.getValue().length(); i++) {          //O(n)
                 //If they are equal, all the bits have been processed to nodes, and the final leaf should get the character
-                if (i == entry.getValue().length()) {
+                if (i == entry.getValue().length()) {                       //O(n)
                     //At the end of the code; the character should be inserted here
                     currNode.chararacter = entry.getKey().toString();
                 } else {
-                    if (entry.getValue().charAt(i) == '1') {
+                    if (entry.getValue().charAt(i) == '1') {                //O(n)
                         //Should step right
                         if (currNode.right == null) {
                             currNode.right = new Node();
                         }
                         currNode = currNode.getRight();
 
-                    } else if (entry.getValue().charAt(i) == '0') {
+                    } else if (entry.getValue().charAt(i) == '0') {         //O(n)
                         //Should step left
                         if (currNode.left == null) {
                             currNode.left = new Node();

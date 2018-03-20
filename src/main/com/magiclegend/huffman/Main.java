@@ -24,6 +24,7 @@ public class Main {
     /**
      * For lib usage: https://code.google.com/archive/p/cliche/wikis/Manual.wiki
      * UTF-8 table for testing: http://www.utf8-chartable.de/unicode-utf8-table.pl
+     * BigO cheat sheet: https://stackoverflow.com/a/559862/7193940
      */
     public static void main(String[] args) throws IOException {
         ShellFactory.createConsoleShell("Shell@Hackerboyy", "", new Main())
@@ -45,7 +46,7 @@ public class Main {
         System.out.println("Done building leaves...");
         root = Huffman.buildTree(leaves);
         System.out.println("Done building tree...");
-        hits = Huffman.generateCode(root);
+        hits = Huffman.generateCode(root, true);
         System.out.println("Done generating codes...");
         encoded = Huffman.encode(hits, string);
         System.out.println("Done encoding...");
@@ -61,7 +62,7 @@ public class Main {
             System.out.println("Done building leaves...");
             root = Huffman.buildTree(leaves);
             System.out.println("Done building tree...");
-            hitSet = Huffman.checkNodesv2(root, new HashMap<>(), new BitSet(), new Integer(0));
+            hitSet = Huffman.checkNodesv2(root, new HashMap<>(), new BitSet(),0);
             System.out.println("Done generating codes...");
 //            encoded = Huffman.encode(hits, string);
 //            System.out.println("Done encoding...");

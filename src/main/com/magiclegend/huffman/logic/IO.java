@@ -7,6 +7,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 
 public class IO {
+    //private static final String PATH = "C:/output/";
     private static final String PATH = "output/";
 
     private IO() {
