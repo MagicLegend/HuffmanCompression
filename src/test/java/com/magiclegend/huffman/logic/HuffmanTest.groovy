@@ -23,19 +23,12 @@ class HuffmanTest extends GroovyTestCase {
     }
 
     void testGenerateCode() {
-        HashMap<Character, String> test = Huffman.generateCode(getRoot())
-        assertEquals(true, test.containsKey('e' as Character))
-        assertEquals("000", test.get('e' as Character))
-        assertEquals("0110", test.get('r' as Character))
-        assertEquals("001", test.get(' ' as Character))
     }
 
     void testEncode() {
-        assertEquals("11110111001100000110100001101100000010100011000001110101", Huffman.encode(getKeys(), STRING))
     }
 
     void testDecode() {
-        assertEquals("Just lemme freak", Huffman.decode(getKeys(), "11110111001100000110100001101100000010100011000001110101"))
     }
 
     static private HashMap<Character, Long> getCharacters() {
@@ -65,31 +58,5 @@ class HuffmanTest extends GroovyTestCase {
         }
 
         return queue
-    }
-
-    private static Node getRoot() {
-        PriorityQueue<Node> tree = getQueue()
-        while (tree.size() > 1) {
-            tree.add(new Node(tree.poll(), tree.poll()))
-        }
-
-        return tree.peek()
-    }
-
-    private static HashMap<Character, String> getKeys() {
-        HashMap<Character, String> keys = new HashMap<>()
-        keys.put(' ' as Character, "001")
-        keys.put('a' as Character, "0111")
-        keys.put('r' as Character, "0110")
-        keys.put('s' as Character, "1001")
-        keys.put('t' as Character, "1000")
-        keys.put('u' as Character, "1011")
-        keys.put('e' as Character, "000")
-        keys.put('f' as Character, "0100")
-        keys.put('J' as Character, "111")
-        keys.put('k' as Character, "0101")
-        keys.put('l' as Character, "1010")
-        keys.put('m' as Character, "110")
-        return keys
     }
 }
