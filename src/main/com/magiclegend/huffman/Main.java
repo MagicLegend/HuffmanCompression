@@ -18,28 +18,35 @@ public class Main {
                 .commandLoop();
     }
 
+    /**
+     * Encodes the given string into the given file.
+     */
     @Command
-    public void testBitsReadFromFileChaining(String file) {
-        String output = create().readBitsFromFile(file).decode().writeTextToConsole().execute();
-    }
-
-    @Command
-    public void testTextBitsWriteToFileChaining(String text, String file) {
+    public void testEncodeTextAndWriteToFile(String text, String file) {
         String output = create().enterString(text).determineWeight().generateLeaves().buildTree().generateCode(false).encode().writeBitsToFile(file).execute();
     }
 
+    /**
+     * Reads the given (text) file and encodes it; and writes it to the second file.
+     */
     @Command
-    public void testLoremBitsWriteToFileChaining(String loremFile, String file) {
+    public void testReadTextEncodeAndWriteToFile(String loremFile, String file) {
         create().readLorem(loremFile).determineWeight().generateLeaves().buildTree().generateCode(false).encode().writeBitsToFile(file).execute();
     }
 
+    /**
+     * Reads the given file, and writes the decoded output to the given text file.
+     */
     @Command
-    public void testStringBitsWriteToFileChaining(String file, String content) {
-        create().enterString(content).determineWeight().generateLeaves().buildTree().generateCode(false).encode().writeBitsToFile(file).execute();
+    public void testReadBitsFromFileToFile(String source, String destination) {
+        create().readBitsFromFile(source).decode().writeTextToFile(destination).execute();
     }
 
+    /**
+     * Reads the given file, and logs the decoded output to the console.
+     */
     @Command
-    public void testReadBitsFromFileToFileChaining(String source, String destination) {
-        create().readBitsFromFile(source).decode().writeTextToFile(destination).execute();
+    public void testReadBitsFromFileAndLog(String source) {
+        create().readBitsFromFile(source).decode().writeTextToConsole().execute();
     }
 }
