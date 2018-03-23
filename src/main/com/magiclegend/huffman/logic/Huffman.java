@@ -1,22 +1,57 @@
 package main.com.magiclegend.huffman.logic;
 
+import main.com.magiclegend.huffman.logic.interfaces.IExecute;
+import main.com.magiclegend.huffman.logic.interfaces.IHuffman;
+import main.com.magiclegend.huffman.logic.interfaces.intermediates.*;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class Huffman {
+@SuppressWarnings("Duplicates")
+public class Huffman implements IHuffman, IExecute, IICharacters, IIEncoded, IIHits, IILeaves, IIRoot, IIString, IIDecoded, IIDecodedOutput {
+    //private static final String PATH = "C:/output/";
+    private static final String PATH = "output/";
+
+    private String string;
+    private HashMap<Character, Long> characters;
+    private PriorityQueue<Node> leaves;
+    private Node root;
+    private HashMap<Character, String> hits;
+    private HashMap<Character, BitSet> hitSet;
+    private String encoded;
 
     private Huffman() {
-        throw new IllegalStateException("Utility class");
+
+    }
+
+    public static IHuffman create() {
+        return new Huffman();
+    }
+
+    /**
+     * Sets the string to the given string.
+     *
+     * @param s The string that should be used further down the chain.
+     * @return An intermediate interface.
+     */
+    @Override
+    public IIString enterString(String s) {
+        this.string = s;
+        return this;
     }
 
     /**
      * Determines how often the letters occur in the string.
      *
-     * @param string The string to consider.
+     * @return An intermediate interface.
      */
-    public static HashMap<Character, Long> determineWeight(String string) {
+    @Override
+    public IICharacters determineWeight() {
         HashMap<Character, Long> characters = new HashMap<>();
         //Mergemap lambda?
 
@@ -29,54 +64,46 @@ public class Huffman {
                 characters.put(string.charAt(i), 1L);           //O(n)
             }
         }
-
-        return characters;
+        this.characters = characters;
+        return this;
     }
 
     /**
      * Takes the HashMap with <K,V> structure <Character, Count> and iterates over it. For each iteration a new Node is added to the queue.
      * The queue has a custom comparator, which will check if the weight of the nodes are above or below each other.
-     * TODO: Check if a case for equal nodes is needed.
-     *
-     * @param characters The characters with their counts that should be interpreted.
      */
-    public static PriorityQueue<Node> generateLeaves(Map<Character, Long> characters) {
+    @Override
+    public IILeaves generateLeaves() {
         //Comparison from: https://gist.github.com/ahmedengu/aa8d85b12fccf0d08e895807edee7603
-        PriorityQueue<Node> leaves = new PriorityQueue<>((o1, o2) -> (o1.weight < o2.weight) ? -1 : 1);
+        PriorityQueue<Node> leaves = new PriorityQueue<>((o1, o2) -> (o1.getWeight() < o2.getWeight()) ? -1 : 1);
 
         //          O(n)                         O(n)
         characters.forEach((key, value) -> leaves.add(new Node(key, value)));
-
-        return leaves;
+        this.leaves = leaves;
+        return this;
     }
 
     /**
      * Takes the generated leaves, and iterates over them and combines to build the rest of the tree until one node remains.
-     *
-     * @param tree The bottom leaves with their weight.
      */
-    public static Node buildTree(PriorityQueue<Node> tree) {
+    @Override
+    public IIRoot buildTree() {
+        PriorityQueue<Node> tree = leaves;
         while (tree.size() > 1) {                               //O(n) ????
             tree.add(new Node(tree.poll(), tree.poll()));       //O(n)
         }
-
-        return tree.peek();
+        root = tree.peek();
+        return this;
     }
-
-    //BitSet ipv string
-    //CheckNodes returnt de hashmap
-    private static HashMap<Character, String> hits;
 
     /**
      * Generates the bits based on the given root node.
-     *
-     * @param node The root Node object which will contain the entire tree.
-     * @return HashMap with the character and the corresponding code.
      */
-    public static HashMap<Character, String> generateCode(Node node, boolean log) {
+    @Override
+    public IIHits generateCode(boolean log) {
         hits = new HashMap<>();
-        checkNodes(node, "", log);
-        return hits;
+        checkNodes(root, "", log);
+        return this;
     }
 
     /**
@@ -85,121 +112,68 @@ public class Huffman {
      * @param node   The root Node object which will contain the entire tree.
      * @param string The code that is generated.
      */
-    private static void checkNodes(Node node, String string, boolean log) {
+    private void checkNodes(Node node, String string, boolean log) {
         if (node != null) {
-            if (node.right != null) {
-                checkNodes(node.right, string + "1", log);
+            if (node.getRight() != null) {
+                checkNodes(node.getRight(), string + "1", log);
             }
 
-            if (node.left != null) {
-                checkNodes(node.left, string + "0", log);
+            if (node.getLeft() != null) {
+                checkNodes(node.getLeft(), string + "0", log);
             }
 
-            if (node.right == null && node.left == null) {
+            if (node.getRight() == null && node.getLeft() == null) {
                 //Done generating code
-                if (node.chararacter.length() == 1) {
+                if (node.getChararacter().length() == 1) {
                     if (log) {
-                        System.out.println("Char: " + node.chararacter + " | Code: " + string);
+                        System.out.println("Char: " + node.getChararacter() + " | Code: " + string);
                     }
-                    hits.put(node.chararacter.charAt(0), string);
+                    hits.put(node.getChararacter().charAt(0), string);
                 } else {
-                    System.out.println("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
-                    throw new IllegalArgumentException("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
+                    System.out.println("Character (" + node.getChararacter() + ") was longer than 1; something went wrong!");
+                    throw new IllegalArgumentException("Character (" + node.getChararacter() + ") was longer than 1; something went wrong!");
                 }
             }
         }
-    }
-
-    public static void generateCodeV2(Node node) {
-        //0100 0000 0000 0011 1111 1011 //max value (4195323)
-        //https://math.stackexchange.com/a/664856 (amount of nodes = 4n - 1; where n = amount of leaves)
-        //This means that the first three bytes of the bitSet should be reserved for counting. This would mean that it would support a tree with 16.777.215 nodes, but that is the point that with the current Unicode will cannot be reached. There are not enough characters (only 1.048.831)
-    }
-
-    /**
-     * Updated version to integrate the variables. Checks if a node is a tree node, and recursivly runs the function again on that node.
-     * Will add the code of the character to the bitSet until the leaf node is found. Then it will add it to the hashmap that is passed along.
-     * It will return the HashMap back to the upper levels, and it will go down the tree again.
-     *
-     * @param node The root node on the initial call, after that it's the tree node until the leaf is reached.
-     * @param hits The HashMap with the Character and it's corresponding code in a BitSet.
-     * @param bitSet The code of the current character that's being built. Cleared when a leaf has been reached.
-     * @param counter The counter to keep track of what location the bit should be flipped. Reset to 0 when a leaf has been reached.
-     * @return
-     */
-    public static HashMap<Character, BitSet> checkNodesv2(Node node, HashMap<Character, BitSet> hits, BitSet bitSet, int counter) {
-        if (node != null) {
-            if (node.right != null) {
-                bitSet.set(counter);
-                counter++;
-                int temp = counter;
-                checkNodesv2(node.right, hits, bitSet, counter);
-                counter = temp;
-            }
-
-            if (node.left != null) {
-                counter++;
-                checkNodesv2(node.left, hits, bitSet, counter);
-            }
-
-            if (node.right == null && node.left == null) {
-                if (node.chararacter.length() == 1) {
-                    System.out.println("Char: " + node.chararacter + " | Code: " + bitSet.toString());
-                    hits.put(node.chararacter.charAt(0), bitSet);
-                    bitSet.clear();
-                    counter = 0;
-                    return hits;
-                } else {
-                    System.out.println("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
-                    throw new IllegalArgumentException("Character (" + node.chararacter + ") was longer than 1; something went wrong!");
-                }
-            }
-        }
-        return hits;
     }
 
     /**
      * Encodes the given string with the keys.
-     *
-     * @param keys   The keys which which the string should be encoded.
-     * @param string The string that should be encoded.
-     * @return The encoded string.
      */
-    public static String encode(Map<Character, String> keys, String string) {
+    @Override
+    public IIOutput encode() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {     //O(n)
-            sb.append(keys.get(string.charAt(i)));      //O(n)
+            sb.append(hits.get(string.charAt(i)));      //O(n)
         }
-        //System.out.println("Code: " + sb.toString());
-        return sb.toString();
+        encoded = sb.toString();
+        return this;
     }
 
     /**
      * Decodes the given string with the keys.
-     *
-     * @param keys          The keys with which the string can be decoded.
-     * @param encodedString The encoded string that should be decoded.
-     * @return The decoded string.
      */
-    public static String decode(Map<Character, String> keys, String encodedString) {
+    @Override
+    public IIDecodedOutput decode() {
         StringBuilder sb = new StringBuilder();
-        Node root = rebuildTree(keys);
+        Node root = rebuildTree(hits);
         Node currNode = root;
 
-        for (int i = 0; i < encodedString.length(); i++) {
-            Character currChar = encodedString.charAt(i);
+        for (int i = 0; i < encoded.length(); i++) {
+            Character currChar = encoded.charAt(i);
             if (currChar == '1') {
                 currNode = currNode.getRight();
             } else if (currChar == '0') {
                 currNode = currNode.getLeft();
             }
 
-            if (currNode.chararacter != null) {
-                sb.append(currNode.chararacter);
+            if (currNode.getChararacter() != null) {
+                sb.append(currNode.getChararacter());
                 currNode = root;
             }
         }
-        return sb.toString();
+        string = sb.toString();
+        return this;
     }
 
     /**
@@ -221,19 +195,19 @@ public class Huffman {
                 //If they are equal, all the bits have been processed to nodes, and the final leaf should get the character
                 if (i == entry.getValue().length()) {                       //O(n)
                     //At the end of the code; the character should be inserted here
-                    currNode.chararacter = entry.getKey().toString();
+                    currNode.setChararacter(entry.getKey().toString());
                 } else {
                     if (entry.getValue().charAt(i) == '1') {                //O(n)
                         //Should step right
-                        if (currNode.right == null) {
-                            currNode.right = new Node();
+                        if (currNode.getRight() == null) {
+                            currNode.setRight(new Node());
                         }
                         currNode = currNode.getRight();
 
                     } else if (entry.getValue().charAt(i) == '0') {         //O(n)
                         //Should step left
-                        if (currNode.left == null) {
-                            currNode.left = new Node();
+                        if (currNode.getLeft() == null) {
+                            currNode.setLeft(new Node());
                         }
                         currNode = currNode.getLeft();
                     }
@@ -242,5 +216,152 @@ public class Huffman {
         }
 
         return root;
+    }
+
+    /**
+     * Final function that executes in the chain.
+     *
+     * @return Either the decoded string or the encoded string.
+     */
+    @Override
+    public String execute() {
+        if (string.length() > 0) {
+            return string;
+        } else {
+            return encoded;
+        }
+    }
+
+    /**
+     * https://stackoverflow.com/a/39684467/7193940
+     *
+     * @param file The file to where should be written.
+     */
+    @Override
+    public IExecute writeBitsToFile(String file) {
+        BitSet bitSet = new BitSet(encoded.length());
+
+        int bitCounter = 0;
+        for (Character c : encoded.toCharArray()) {
+            if (c == '1') {
+                bitSet.set(bitCounter);
+            }
+
+            bitCounter++;
+        }
+        bitSet.set(bitCounter); //Set the latest bit to true to prevent data loss in case the last bits were false.
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + file))) {
+            oos.writeObject(hits);
+            oos.writeObject(bitSet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * Takes the hits and the encoded code and writes it to a file as objects.
+     *
+     * @param file The file that it should be written towards.
+     */
+    @Override
+    public IExecute writeToFile(String file) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PATH + file))) {
+            oos.writeObject(hits);
+            oos.writeObject(encoded);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * Reads the expected HashMap with keys and BitSet with bits from the given file.
+     *
+     * @param file The file that it should be read.
+     */
+    @Override
+    public IHuffman readBitsFromFile(String file) {
+        BitSet bitSet = null;
+        StringBuilder sb = new StringBuilder();
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + file))) {
+            hits = (HashMap<Character, String>) ois.readObject();
+            bitSet = (BitSet) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (bitSet != null) {
+            System.out.println("Size: " + bitSet.size());
+            System.out.println("Length: " + bitSet.length());
+            for (int i = 0; i < bitSet.length() - 1; i++) { //Because the length() returns the length + 1; and the final bit needs to be ignored a -1 in combination with the < (instead of <=) is needed.
+                if (bitSet.get(i)) {
+                    sb.append("1");
+                } else {
+                    sb.append("0");
+                }
+            }
+        }
+
+        encoded = sb.toString();
+        return this;
+    }
+
+    /**
+     * Reads the given bin file.
+     *
+     * @return HashMap with the characters and their codes.
+     */
+    @Override
+    public IHuffman readFromFile(String file) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PATH + file))) {
+            hits = (HashMap<Character, String>) ois.readObject();
+            encoded = (String) ois.readObject();
+            System.out.println("Encoded: " + encoded);
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * Reads the text file in the output folder.
+     *
+     * @return A load of lorem ipsum.
+     */
+    @Override
+    public IIString readLorem(String file) {
+        try {
+            string = new String(Files.readAllBytes(Paths.get(PATH + file)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * Writes the given text to a txt file. Used to output the decoded text.
+     *
+     * @param file The file to which the given text should be written.
+     */
+    @Override
+    public IExecute writeTextToFile(String file) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(PATH + file))) {
+            out.print(string);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * Logs the current string to the console.
+     */
+    @Override
+    public IExecute writeTextToConsole() {
+        System.out.println(string);
+        return this;
     }
 }

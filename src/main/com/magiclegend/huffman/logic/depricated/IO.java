@@ -1,4 +1,4 @@
-package main.com.magiclegend.huffman.logic;
+package main.com.magiclegend.huffman.logic.depricated;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.HashMap;
 
+@SuppressWarnings("Duplicates")
 public class IO {
     //private static final String PATH = "C:/output/";
     private static final String PATH = "output/";

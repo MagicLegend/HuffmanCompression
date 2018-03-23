@@ -3,11 +3,11 @@ package main.com.magiclegend.huffman.logic;
 import java.util.Comparator;
 
 public class Node implements Comparable<Node> {
-    Node left, right;
+    private Node left, right;
 
-    double weight;
-    String chararacter;
+    private double weight;
 
+    private String chararacter;
     /**
      * Initial constructor to create the bottom nodes (with characters).
      *
@@ -18,6 +18,7 @@ public class Node implements Comparable<Node> {
         this.chararacter = String.valueOf(character);
         this.weight = weight;
     }
+
     /**
      * Second constructor to add the nodes above. https://codingsec.net/2016/03/compress-data-using-java-code-huffmans-coding-algorithm/
      * Comparison which node should be the left and which should be the right should be done here.
@@ -38,7 +39,6 @@ public class Node implements Comparable<Node> {
             this.right = left;
         }
     }
-
     /**
      * Empty constructor for rebuilding the tree structure.
      */
@@ -68,6 +68,14 @@ public class Node implements Comparable<Node> {
 
     public void setChararacter(String chararacter) {
         this.chararacter = chararacter;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
     /**

@@ -3,7 +3,7 @@ package test.java.com.magiclegend.huffman.logic
 import com.google.common.hash.HashCode
 import com.google.common.hash.Hashing
 import com.google.common.io.Files
-import main.com.magiclegend.huffman.logic.IO
+import main.com.magiclegend.huffman.logic.depricated.IO
 
 class IOTest extends GroovyTestCase {
     static String ENCODED = "11110111001100000110100001101100000010100011000001110101"

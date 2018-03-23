@@ -1,6 +1,6 @@
 package test.java.com.magiclegend.huffman.logic
 
-import main.com.magiclegend.huffman.logic.Huffman
+import main.com.magiclegend.huffman.logic.depricated.Huffman
 import main.com.magiclegend.huffman.logic.Node
 
 class HuffmanTest extends GroovyTestCase {
